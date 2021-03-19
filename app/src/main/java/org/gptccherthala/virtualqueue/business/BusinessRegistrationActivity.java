@@ -20,8 +20,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseException;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -29,6 +27,8 @@ import com.google.firebase.storage.UploadTask;
 
 import org.gptccherthala.virtualqueue.R;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class BusinessRegistrationActivity extends AppCompatActivity {
@@ -44,11 +44,10 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
     Button btnChoose;
     Button btnRegister;
     String userId;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Uri filePath;
-    private DatabaseReference mDataBase;
     private StorageReference mStorageReference;
     private String imageUrl;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +63,6 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
         spType = findViewById(R.id.spinner_type);
         btnChoose = findViewById(R.id.image_choose);
         btnRegister = findViewById(R.id.button_register);
-        mDataBase = FirebaseDatabase.getInstance().getReference();
         userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         mStorageReference = FirebaseStorage.getInstance().getReference();
 
@@ -125,7 +123,6 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -163,15 +160,31 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
 
                     if (checkFieldData(name, address, pincode, phoneString, description, imageUrl)) {
                         try {
-                            BusinessDatabase data = new BusinessDatabase(name, address, phone, pincode, description, category, imageUrl);
+                            // business an variable with key value pair used to store in fire store using key value pair
+                            Map<String, Object> Business = new HashMap<>();
 
-                            mDataBase.child("business").child(category).child(type).child(userId).setValue(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            // name is an key value pair and store the value in db
+                            Business.put("Name", name);
+                            Business.put("Address", address);
+                            Business.put("Phone", phone);
+                            Business.put("Pincode", pincode);
+                            Business.put("Description", description);
+                            Business.put("Category", category);
+                            Business.put("ImageUrl", imageUrl);
+
+                            // it this collection path Business will be the document name userId
+                            db.collection("business")
+                                    .document(userId).set(Business).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
+                                    // if task is successful
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(BusinessRegistrationActivity.this, "Success", Toast.LENGTH_SHORT);
+                                        Toast.makeText(getApplicationContext(), "Business registration Success", Toast.LENGTH_SHORT).show();
+                                        Intent business = new Intent(getApplicationContext(), BusinessHomeActivity.class);
+                                        startActivity(business);
+                                        BusinessRegistrationActivity.this.finish();
                                     } else {
-                                        Toast.makeText(BusinessRegistrationActivity.this, "Failed", Toast.LENGTH_SHORT);
+                                        Toast.makeText(getApplicationContext(), "Failed to register", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
@@ -184,7 +197,6 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     public boolean checkFieldData(String companyName, String address, int pincode
@@ -218,7 +230,7 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
         }
 
         if (imageUrl == null || imageUrl.isEmpty()) {
-            Toast.makeText(BusinessRegistrationActivity.this,"An ERROR OCCURED ",Toast.LENGTH_LONG).show();
+            Toast.makeText(BusinessRegistrationActivity.this, "An ERROR OCCURED ", Toast.LENGTH_LONG).show();
             return false;
         }
 
