@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
     Button btnChoose;
     Button btnRegister;
     String userId;
+    ProgressBar pbar;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Uri filePath;
     private StorageReference mStorageReference;
@@ -63,6 +65,7 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
         spType = findViewById(R.id.spinner_type);
         btnChoose = findViewById(R.id.image_choose);
         btnRegister = findViewById(R.id.button_register);
+        pbar = findViewById(R.id.pbar);
         userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         mStorageReference = FirebaseStorage.getInstance().getReference();
 
@@ -155,8 +158,6 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
                     String description = etDescription.getText().toString();
                     String category = spCategory.getSelectedItem().toString();
                     String type = spType.getSelectedItem().toString();
-
-                    uploadImage();
 
                     if (checkFieldData(name, address, pincode, phoneString, description, imageUrl)) {
                         try {
@@ -251,11 +252,13 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             filePath = data.getData();
+            uploadImage();
         }
     }
 
     private void uploadImage() {
         if (filePath != null) {
+            pbar.setVisibility(View.VISIBLE);
             StorageReference ref = mStorageReference.child("images/" + userId);
             ref.putFile(filePath)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -266,6 +269,7 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     imageUrl = task.getResult().toString();
+                                    pbar.setVisibility(View.GONE);
                                 }
                             });
                         }
@@ -274,6 +278,7 @@ public class BusinessRegistrationActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             btnChoose.setError("Image upload failed");
+                            pbar.setVisibility(View.GONE);
                             Toast.makeText(BusinessRegistrationActivity.this, "Failed ", Toast.LENGTH_SHORT).show();
                         }
                     });
