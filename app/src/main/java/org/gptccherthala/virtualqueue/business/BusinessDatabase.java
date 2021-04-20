@@ -10,6 +10,15 @@ public class BusinessDatabase {
     public int imagePath;
     public String imageUrl;
     public String type;
+    public String bId;
+
+    public String getbId() {
+        return bId;
+    }
+
+    public void setbId(String bId) {
+        this.bId = bId;
+    }
 
     public BusinessDatabase() {
     }
@@ -24,9 +33,10 @@ public class BusinessDatabase {
         this.type = type;
     }
 
-    public BusinessDatabase(String name, String imageUrl) {
+    public BusinessDatabase(String name, String imageUrl, String bId) {
         this.name = name;
         this.imageUrl = imageUrl;
+        this.bId = bId;
     }
 
     public BusinessDatabase(String name, String address, long phone, int pincode, String description, String category, String imageUrl) {
