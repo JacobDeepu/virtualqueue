@@ -25,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.gptccherthala.virtualqueue.QueueDetails;
 import org.gptccherthala.virtualqueue.R;
+import org.gptccherthala.virtualqueue.user.LoadingQr;
 
 import java.util.ArrayList;
 
@@ -119,8 +120,10 @@ public class BusinessDataListRecViewAdapter extends RecyclerView.Adapter<Busines
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful())
-                                                Toast.makeText(mContext, "Success", Toast.LENGTH_SHORT).show();
+                                            if (task.isSuccessful()) {
+                                                LoadingQr qr = new LoadingQr(mContext);
+                                                qr.displayQrCode(userId);
+                                            }
                                             else
                                                 Toast.makeText(mContext, "Failed", Toast.LENGTH_SHORT).show();
                                         }
