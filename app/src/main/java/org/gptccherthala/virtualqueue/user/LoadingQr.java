@@ -44,7 +44,7 @@ public class LoadingQr {
         int height = point.y;
 
         int dimen = Math.min(width, height);
-        dimen = dimen * 3 / 4;
+        dimen = dimen * 2 / 4;
 
         QRGEncoder qrgEncoder = new QRGEncoder(userId, null, QRGContents.Type.TEXT, dimen);
         try {
