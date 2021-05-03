@@ -11,16 +11,13 @@ public class BusinessDatabase {
     public String imageUrl;
     public String type;
     public String bId;
-
-    public String getbId() {
-        return bId;
-    }
-
-    public void setbId(String bId) {
-        this.bId = bId;
-    }
+    public boolean isOpen;
 
     public BusinessDatabase() {
+    }
+
+    public BusinessDatabase(boolean isOpen) {
+        this.isOpen = isOpen;
     }
 
     public BusinessDatabase(int imagePath) {
@@ -47,6 +44,14 @@ public class BusinessDatabase {
         this.description = description;
         this.category = category;
         this.imageUrl = imageUrl;
+    }
+
+    public String getbId() {
+        return bId;
+    }
+
+    public void setbId(String bId) {
+        this.bId = bId;
     }
 
     public String getType() {
@@ -116,4 +121,5 @@ public class BusinessDatabase {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
 }

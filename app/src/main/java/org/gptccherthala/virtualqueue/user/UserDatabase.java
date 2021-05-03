@@ -8,6 +8,10 @@ public class UserDatabase {
     public UserDatabase() {
     }
 
+    public UserDatabase(String name, long phoneNumber) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+    }
     public UserDatabase(String name, long phoneNumber, int pinCode) {
         this.name = name;
         this.phoneNumber = phoneNumber;
