@@ -1,5 +1,9 @@
 package org.gptccherthala.virtualqueue.business;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.gptccherthala.virtualqueue.R;
@@ -19,9 +25,11 @@ import java.util.ArrayList;
 
 public class JoinedUsersListRecViewAdapter extends RecyclerView.Adapter<JoinedUsersListRecViewAdapter.ViewHolder> {
 
+    private Context mContext;
     private ArrayList<UserDatabase> userDatabase = new ArrayList<>();
 
-    public JoinedUsersListRecViewAdapter() {
+    public JoinedUsersListRecViewAdapter(Context mContext) {
+        this.mContext = mContext;
     }
 
     @NonNull
@@ -35,6 +43,26 @@ public class JoinedUsersListRecViewAdapter extends RecyclerView.Adapter<JoinedUs
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.uName.setText(userDatabase.get(position).name);
+
+        createNotificationChannel();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, "000")
+                .setSmallIcon(R.drawable.alert)
+                .setContentTitle("My notification")
+                .setContentText("Much longer text that cannot fit one line...")
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText("Much longer text that cannot fit one line..."))
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+
+        holder.alert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(mContext);
+
+                notificationManager.notify(000, builder.build());
+
+            }
+        });
+
     }
 
     @Override
@@ -63,4 +91,21 @@ public class JoinedUsersListRecViewAdapter extends RecyclerView.Adapter<JoinedUs
             uName = itemView.findViewById(R.id.uName);
         }
     }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Test";
+            String description = "Test Channel";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("000", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = mContext.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 }
